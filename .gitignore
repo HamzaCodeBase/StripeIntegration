@@ -364,3 +364,4 @@ FodyWeavers.xsd
 
 # Ignore only appsettings.Development.json everywhere
 **/appsettings.Development.json
+config.bat

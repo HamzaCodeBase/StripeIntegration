@@ -13,10 +13,8 @@ namespace StripeIntegration.Controllers
             _configuration = configuration;
         }
 
-        [HttpPost]
-        public IActionResult CreateCheckoutSession([FromBody] CheckoutFormModel model)
+        public IActionResult CreateCheckoutSession(CheckoutFormModel model)
         {
-            StripeConfiguration.ApiKey = _configuration["Stripe:SecretKey"];
             var options = new SessionCreateOptions
             {
                 PaymentMethodTypes = new List<string> { "card" },
@@ -30,30 +28,29 @@ namespace StripeIntegration.Controllers
                         ProductData = new SessionLineItemPriceDataProductDataOptions
                         {
                             Name = model.ProductName,
-                            Description = model.ProductDescription,
+                            Description = model.ProductDescription
                         },
-                        UnitAmount = model.Amount,
+                        UnitAmount = model.Amount
                     },
-                    Quantity = 1,
-                },
+                    Quantity = 1
+                }
             },
                 Mode = "payment",
                 SuccessUrl = $"{Request.Scheme}://{Request.Host}/checkout/success",
-                CancelUrl = $"{Request.Scheme}://{Request.Host}/checkout/cancel",
+                CancelUrl = $"{Request.Scheme}://{Request.Host}/checkout/cancel"
             };
+
             var service = new SessionService();
             var session = service.Create(options);
-            return Ok(new { sessionId = session.Id });
+
+            // Redirect to Stripe Checkout
+            return Redirect(session.Url);
         }
-        [HttpGet("success")]
-        public IActionResult Success()
-        {
-            return View();
-        }
-        [HttpGet("cancel")]
-        public IActionResult Cancel()
-        {
-            return View();
-        }
+
+        [HttpGet]
+        public IActionResult Success() => View();
+
+        [HttpGet]
+        public IActionResult Cancel() => View();
     }
 }
